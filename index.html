@@ -1,0 +1,89 @@
+<!-- Working version of https://dribbble.com/shots/14552329--Exploration-Task-Management-Dashboard -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Marck+Script&display=swap');
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="style.css">
+    <title>Task Control</title>
+</head>
+
+<!-- Modal Add Task -->
+
+
+
+<body>
+  <div class='app'>
+    <main class='project' style="background-image: url('background/bg4.jpg'); background-size: cover;">
+      
+      <div class="project-info">
+        <div class="center-title">
+          <h1>Task Control</h1>
+        </div>
+        <button id="openTaskModal" class="add-task-btn">+ Add Task</button>
+      </div>
+      
+      <div class='project-tasks'></div>
+
+
+      <div id="overlay" class="overlay"></div>
+
+      <div id="taskModal" class="modal" style="display: none;">
+        
+        <div class="modal-content" style="width: 30vw;">
+          <div class="modal-header">
+            <h2>Add Task</h2>
+            <span id="closeTaskModal" class="close-modal">&times;</span>
+          </div>
+          
+          <div>
+            <label>Status:</label>
+            <select id="taskStatus">
+                <option value="To do">To do</option>
+                <option value="Event">Event</option>
+            </select>
+          </div>
+
+          <div>
+              <label>Task Name:</label>
+              <input type="text" id="taskName" />
+          </div>
+  
+          <div>
+              <label>Description:</label>
+              <textarea id="taskDescription" rows="4" cols="50"></textarea>
+          </div>
+  
+          <div>
+              <label id="taskDeadlineLabel">Deadline:</label>
+              <input type="datetime-local" id="taskDeadline" style="cursor: pointer;" />
+          </div>
+  
+          
+  
+          <div id="durationContainer" style="display: none;">
+              <label>Duration (mins):</label>
+              <input type="number" id="taskDuration" min="1" />
+          </div>
+  
+          <div>
+              <button id="saveTask">Add task</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <aside class='task-details'>
+    
+    </aside>
+
+    <script type="module" src="app.js"></script>
+
+  </div>
+</body>

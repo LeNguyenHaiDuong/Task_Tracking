@@ -1,0 +1,587 @@
+:root {
+    --bg:#ebf0f7;
+    --header:#fbf4f6;
+    --text:#2e2e2f;
+    --white:#ffffff;
+    --light-grey:#c4cad3; 
+    --tag-1:#ceecfd;
+    --tag-1-text:#2e87ba;
+    --tag-2:#d6ede2;
+    --tag-2-text:#13854e;
+    --tag-3:#ceecfd;
+    --tag-3-text:#2d86ba;
+    --tag-4:#f2dcf5;
+    --tag-4-text:#a734ba;
+    --purple:#7784ee;
+  }
+  *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Poppins', sans-serif;
+    
+  }
+  
+  body {
+    color:var(--text);
+  }
+  
+  @mixin display {
+    display:flex;
+    align-items:center;
+  }
+  
+  .app {
+    height: 100vh; 
+    overflow: hidden;
+    width:100%;
+  }
+  
+  h1 {
+    font-size:30px;
+  }
+
+  .project {
+    padding: 1rem 2rem 0 2rem;
+    max-width: 85%;
+    width: 100%;
+    height: 100vh;
+    display: inline-block;
+  
+    &-info {
+      text-align: center;
+      padding: 1.5rem 1rem 1.5rem 0;
+      display: flex;
+      width: 100%;
+      justify-content: center; /* Căn giữa toàn bộ nội dung */
+      align-items: center;
+  
+      /* Bao quanh h1 để đảm bảo nó được căn giữa */
+      .center-title {
+        margin-left: 7.5rem;
+        display: flex;
+        justify-content: center;
+        flex-grow: 1; /* Đảm bảo h1 chiếm không gian và căn giữa */
+      }
+  
+      h1 {
+        color: #114a7f;
+        position: relative;
+        margin: 0; /* Loại bỏ khoảng cách mặc định của h1 */
+        font-family: "Marck Script", serif;
+        font-weight: 1000;
+        font-style: normal;
+        font-size: 4rem;
+      }
+  
+      .add-task-btn {
+        padding: 12px 15px;
+        background-color: #3f7dae;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: #114a7f;
+        }
+      }
+    }
+  
+  
+    
+    &-tasks {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      width:100%;
+      grid-column-gap:1.5rem;
+    }
+    &-column {
+      background: linear-gradient(
+        180deg,
+        #90bcd538,
+        #aae0ff4d
+      ); // Màu nền nhạt
+      border-radius: 13px; // Bo góc mềm mại
+      padding: 10px; // Khoảng cách bên trong
+      padding-top: 15px;
+      padding-bottom: 16px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); // Hiệu ứng đổ bóng nhẹ
+      height: 78vh;
+      position: relative; // Giữ vị trí
+      
+      backdrop-filter: blur(8px);
+      border: 2px solid #ebf0f7;
+
+      &-heading {
+        position: sticky;
+        top: 0;
+        margin-bottom:0.6rem;
+        @include display;
+        justify-content:space-between;
+        &__title {
+          padding: 6px;
+          font-size:20px;
+        }
+        &__options {
+          background:transparent;
+          color:var(--light-grey);
+          font-size:18px;
+          border:0;
+          cursor:pointer;
+        }
+      }
+
+      // Phần chứa các task
+      .task-list {
+        border-radius: 13px;
+        flex-grow: 1; // Cho phép task-list chiếm không gian còn lại
+        overflow-y: auto; // Ẩn thanh cuộn khi không hover
+        max-height: calc(78vh - 10.5vh); // Giới hạn chiều cao phần task list, tránh tràn
+      }
+      .task-list::-webkit-scrollbar {
+        width: 0px;  /* Ẩn thanh cuộn ngang */
+        height: 0px; /* Ẩn thanh cuộn dọc */
+      }
+      .task-list:hover::-webkit-scrollbar {
+        width: 0px;  /* Độ rộng thanh cuộn */
+        height: 0px; /* Độ cao thanh cuộn */
+      }
+    }
+  }
+
+  
+  
+  .task {
+    cursor: move;
+    background-color: var(--white);
+    padding: 0.6rem 1rem 0.6rem 1rem;
+    border-radius: 8px;
+    width: 100%;
+    box-shadow: rgba(99, 99, 99, 0.308) 0px 2px 8px 0px;
+    margin-bottom: 0.8rem;
+    outline: 3px dashed transparent;
+    outline-offset: -5px;
+    position: relative;
+  
+    // Thêm hiệu ứng chuyển tiếp khi thay đổi thuộc tính
+    transition: background-color 0.5s ease, opacity 0.5s ease, outline-color 0.3s ease;
+
+    &.task-done {
+      background-color: rgba(98, 153, 192, 0.774); /* Xanh nhạt */
+      opacity: 0.8;
+      &:hover {
+        outline-color: #a1c7de !important; /* Màu khi hover trên task đã hoàn thành */
+        background-color: rgba(108, 165, 206, 0.822);
+      }
+    }
+
+    &:hover {
+      outline-color: #114a7f4d!important;
+    }
+  
+    // Sử dụng Flexbox để canh chỉnh
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;  // Phân bổ khoảng cách giữa các phần tử
+
+    p {
+      font-weight: bold;
+      font-size: 18px;
+      margin: 0.3rem 0;
+      // Canh trên cùng
+    }
+  
+    a {
+      font-size: 12px;
+      margin: 1.2rem 0;
+      justify-content: center
+    }
+  
+    &__options {
+      background: transparent;
+      border: 0;
+      color: var(--light-grey);
+      font-size: 17px;
+      justify-content: space-between
+    }
+  
+    &__stats {
+      position: relative;
+      width: 100%;
+      color: var(--light-grey);
+      font-size: 12px;
+      margin-top: 1rem;
+  
+      // Canh dưới cùng
+      display: flex;
+      justify-content: flex-start;
+      span:not(:last-of-type) {
+        margin-right: 1rem;
+      }
+      svg {
+        margin-right: 5px;
+      }
+    }
+
+    &__options {
+      background:transparent; 
+      border:0;
+      color:var(--light-grey);
+      font-size:17px;
+    }
+
+
+    .task__tags {
+      display: flex;
+      align-items: center; // Căn giữa theo chiều dọc
+      justify-content: space-between;
+      width: 100%;
+    }
+    
+    /* Kiểu dropdown */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-btn {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--light-grey);
+      transition: color 0.2s;
+    }
+
+    .dropdown-btn:hover {
+      color: #114a7f;
+    }
+
+
+    /* Ẩn menu mặc định */
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      list-style: none;
+      padding: 5px 0;
+      min-width: 100px;
+      display: none;
+      z-index: 10;
+    }
+
+    .dropdown-menu .dropdown-item {
+      padding: 8px 15px;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: left;
+      transition: background 0.2s;
+    }
+
+    .dropdown-menu .dropdown-item:hover {
+      background: #f1f1f1;
+    }
+
+    /* Khi dropdown mở */
+    .dropdown.open .dropdown-menu {
+      display: block;
+    }
+
+    .remaining-time {
+      text-align: right;
+      margin-left: auto;  // Để tự động căn lề bên phải trong khối cha
+    }
+  }
+  
+  
+  .task-hover {
+    border:3px dashed var(--light-grey)!important;
+  }
+  .task-details {
+    width:20%;
+    border-left:1px solid #d9e0e9;
+    display:inline-block;
+    height:100%;
+    vertical-align:top;
+    padding:3rem 2rem;
+  }
+  
+  .tag-progress {
+    margin: 1.5rem 0;
+  
+    h2 {
+      font-size: 16px;
+      margin-bottom: 1rem;
+    }
+  
+    p {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+  
+      span {
+        color: rgb(180, 180, 180);
+      }
+    }
+  
+    .progress {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      border: none;
+      border-radius: 10px;
+      height: 10px;
+    }
+  
+    // ✅ Thêm class chứa từng task
+    .task-progress-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      background: #fff;
+      border-radius: 6px;
+      border-left: 4px solid #007bff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      font-size: 14px;
+  
+      &:last-child {
+        margin-bottom: 0;
+      }
+  
+      .task-progress-name {
+        font-weight: 600;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+      }
+  
+      .task-progress-deadline {
+        font-size: 12px;
+        color: #dc3545;
+        font-weight: 500;
+      }
+    }
+  }
+  
+  
+  .task-activity {
+     h2 {
+      font-size:16px;
+      margin-bottom:1rem;
+    }
+    
+    li {
+      list-style:none;
+      margin:1rem 0;
+      padding:0rem 1rem 1rem 3rem;
+      position:relative;
+    }
+    time {
+      display:block;
+      color:var(--light-grey);
+    }
+  }
+  
+  .task-icon {
+    width:30px;
+    height:30px;
+    border-radius:100rem;
+    position:absolute;
+    top:0;
+    left:0;
+    @include display;
+    justify-content:center;
+    
+  
+    svg {
+      font-size:12px;
+      color:var(--white);
+    }
+    &--attachment {
+      background-color:#fba63c;
+    }
+    
+    &--comment {
+      background-color:#5dc983;
+    }
+    
+    &--edit {
+      background-color:#7784ee;
+    }
+   
+  }
+  
+  .overlay {
+    display: none; /* Ẩn lớp nền khi không sử dụng modal */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 85%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Nền xám mờ */
+    z-index: 99; /* Đảm bảo nền xám nằm dưới modal */
+  }
+
+
+  .modal {
+    display: none;
+    position: fixed;
+    top: 15vh;
+    left: 27vw;
+    width: 85%;
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100; /* Đảm bảo modal hiển thị trên cùng */
+
+
+    .modal-content {
+      position: relative;
+      background-color: white;
+      padding: 20px;
+      width: 30vw;
+      border-radius: 5px;
+  
+      h2 {
+        margin-bottom: 10px;
+      }
+    
+      div {
+        margin-bottom: 15px; /* Tăng khoảng cách giữa các dòng */
+      }
+    
+      label {
+        display: block; /* Đảm bảo label chiếm một dòng riêng */
+        margin-bottom: 5px; /* Tạo khoảng cách giữa label và input */
+      }
+    
+      input, select, textarea {
+        width: 100%; /* Đảm bảo độ dài của tất cả các input, select, textarea chiếm toàn bộ chiều rộng */
+        padding: 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: white;
+        appearance: none; /* Loại bỏ kiểu mặc định của trình duyệt */
+        box-sizing: border-box; /* Đảm bảo padding không làm thay đổi kích thước tổng thể */
+      }
+  
+      select {
+        cursor: pointer;
+      }
+  
+      input, textarea {
+        cursor: i-beam;
+      }
+  
+  
+      textarea {
+        resize: vertical; /* Cho phép điều chỉnh chiều cao của textarea */
+        min-height: 80px; /* Chiều cao tối thiểu cho textarea */
+      }
+  
+      select {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23888888'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px;
+        padding-right: 30px;
+      }
+  
+      #saveTask {
+        font-weight: bold;
+        padding: 10px 15px;
+        background-color: #3f7dae;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    
+        &:hover {
+          background-color: #114a7f;
+        }
+      }
+  
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+  
+      .close-modal {
+        font-size: 32px;
+        cursor: pointer;
+        font-weight: bold;
+  
+        &:hover {
+          color: #114a7f; // Hover chỉ áp dụng trên button
+        }
+      }
+    }
+  }
+  
+  @media only screen and (max-width: 1300px) {
+    .project {
+      max-width:100%;
+    }
+    .task-details {
+      width:100%;
+      display:flex;
+    }
+    .tag-progress,
+    .task-activity {
+      flex-basis:50%;
+      background:var(--white);
+      padding:1rem;
+      border-radius:8px;
+      margin:1rem;
+    }
+  }
+  
+  @media only screen and (max-width: 1000px) {
+    .project-column:nth-child(2),
+    .project-column:nth-child(3){
+      display:none;
+    }
+    .project-tasks {
+      grid-template-columns:1fr 1fr;
+    }
+  }
+  
+  
+  
+  @media only screen and (max-width: 600px) {
+    .project-column:nth-child(4){
+      display:none;
+    }
+    .project-tasks {
+      grid-template-columns:1fr;
+    }
+    
+    .task-details {
+      flex-wrap:wrap;
+      padding:3rem 1rem;
+    }
+    .tag-progress,
+    .task-activity {
+      flex-basis:100%;
+    }
+    h1 {
+      font-size:25px;
+    }
+
+  }
+  
