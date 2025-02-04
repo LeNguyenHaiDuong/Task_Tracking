@@ -72,6 +72,7 @@
           </div>
   
           <div>
+              <button id="editTask">Save Changes</button>
               <button id="saveTask">Add task</button>
           </div>
         </div>
@@ -79,9 +80,25 @@
 
     </main>
 
-    <aside class='task-details'>
-    
+    <aside class="sidebar">
+      <h3>View Mode</h3>
+      <ul>
+        <li>
+          <button class="sidebar-btn" id="kanbanBtn">Kanban</button>
+        </li>
+        <li>
+          <button class="sidebar-btn" id="calendarBtn">Calendar</button>
+        </li>
+        <li>
+          <button class="sidebar-btn" id="statsBtn">Stats</button>
+        </li>
+      </ul>
     </aside>
+    
+    <section id="kanbanView" class="view">Kanban View Content</section>
+    <section id="calendarView" class="view hidden">Calendar View Content</section>
+    <section id="statsView" class="view hidden">Stats View Content</section>
+  
 
     <script type="module" src="app.js"></script>
 

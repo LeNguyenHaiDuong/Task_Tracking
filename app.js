@@ -7,16 +7,11 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 console.log('Supabase Instance: ', supabase)
 
-
-
-
-
 document.addEventListener("DOMContentLoaded", async function () {
 
   const tasksContainer = document.querySelector(".project-tasks");
   const saveTaskBtn = document.getElementById("saveTask");
   let dragSrcEl = null;
-  let tasksData = null;
 
   // Hàm lấy dữ liệu tasks từ Supabase
   async function fetchTasks() {
@@ -32,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   function taskStatus(task, timeDiff) {
     if (task.duration !== null) {
       const durationMs = task.duration * 60 * 1000; // Chuyển duration từ phút sang ms
-      if (timeDiff <= 0 && Math.abs(timeDiff) < durationMs) {
+      if (timeDiff <= 0 && Math.abs(timeDiff) <= durationMs) {
         return "In Progress"; // Nếu đã bắt đầu nhưng chưa hết thời gian
       }
     }
@@ -95,14 +90,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     taskElement.querySelectorAll(".dropdown-item").forEach(item => {
       item.addEventListener("click", function () {
         const action = this.dataset.action;
-        const taskId = this.dataset.id;
-        const taskDone = this.dataset.done === "true";
-
-        // Lấy thông tin task từ danh sách tasksData
-        dragSrcEl = tasksData.find(t => t.created_at === taskId);
-        if (action === "delete") deleteTask(taskId);
-        if (action === "done") markDone(dragSrcEl);
-        if (action === "edit") editTask(dragSrcEl);
+        
+        dragSrcEl = task; // Lưu lại task đang được chọn
+        if (action === "delete") deleteTask(task.created_at, taskElement);
+        if (action === "done") markDone(task, taskElement);
+        if (action === "edit") editTask(task);
       });
     });
 
@@ -113,11 +105,15 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Hàm render tasks vào giao diện
   async function renderTasks() {
     tasksContainer.innerHTML = ""; // Xóa nội dung cũ
-    tasksData = await fetchTasks();
+    let tasksData = await fetchTasks();
   
+    tasksData.forEach(task => {
+      task.remainingTime = updateTaskStatusBasedOnDeadline(task);
+    });
+
     // Các trạng thái cố định
     const fixedStatuses = ['To do', 'Event', 'Today task', 'Expired'];
-  
+
     // Tạo các cột cho từng trạng thái
     fixedStatuses.forEach(status => {
       const columnElement = document.createElement("div");
@@ -133,22 +129,16 @@ document.addEventListener("DOMContentLoaded", async function () {
       `;
 
       const taskListElement = columnElement.querySelector(".task-list"); // Phần chứa task
-  
-      // Duyệt qua các task và thêm vào cột nếu trạng thái của task khớp với cột
-      tasksData.forEach(task => {
-        let remainingTime = updateTaskStatusBasedOnDeadline(task);
 
-        if (task.status == status) {
-          const taskElement = taskHTML(task, remainingTime);    
-          // Thêm task vào trong cột
-          taskListElement.appendChild(taskElement);
-        }
-      });
+      tasksData
+        .filter(task => task.status === status)
+        .forEach(task => {
+            const taskElement = taskHTML(task, task.remainingTime);
+            taskListElement.appendChild(taskElement);
+        });
   
       // Thêm cột vào container
       tasksContainer.appendChild(columnElement);
-
-      
     });
   
     addDragEvents(); // Thêm sự kiện kéo thả vào các task
@@ -175,66 +165,52 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
-  window.markDone = async function (task) {
+  window.markDone = async function (task, taskElement) {
+    // Thay đổi trạng thái
     task.done = !task.done;
+
+    if (taskElement) {
+      if (task.done) {
+        taskElement.classList.add("task-done"); // Thêm class khi hoàn thành
+      } else {
+        taskElement.classList.remove("task-done"); // Xóa class nếu chưa hoàn thành
+      }
+    }
+
     const { data, error } = await supabase.from('Task')
       .update({ done: task.done}) 
       .eq('created_at', task.created_at.trim());
-
-    if (error) {
-      console.error("Lỗi cập nhật trạng thái task:", error.message);
-    } else {
-      console.log("Cập nhật thành công:", data);
-      // Tìm taskElement dựa trên `data-task-id`
-      const taskElement = document.querySelector(`[data-task-id='${task.created_at}']`);
-      
-      if (taskElement) {
-        if (task.done) {
-          taskElement.classList.add("task-done"); // Thêm class khi hoàn thành
-        } else {
-          taskElement.classList.remove("task-done"); // Xóa class nếu chưa hoàn thành
-        }
-      }
-    }
   }
 
-  window.deleteTask = async function (created_at) {
+  window.deleteTask = async function (created_at, taskElement) {
     console.log("Attempting to delete task with created_at:", created_at);
   
+    taskElement.remove();
+    console.log("Task deleted successfully!");
+
     const { error } = await supabase.from('Task')
       .delete()
       .eq('created_at', created_at.trim());  // Dùng trim để loại bỏ khoảng trắng
-  
-    if (error) {
-      console.error("Error deleting task:", error);
-    } else {
-      const taskElement = document.querySelector(`[data-task-id='${created_at}']`);
-      if (taskElement) {
-        taskElement.remove();
-        console.log("Task deleted successfully!");
-      }
-    }
   }
   
-  function editTask(task) {
+
+  function openModalEditMode() {
     // Mở modal
     modal.style.display = "block";
     background.style.display = "block";
-
-    const taskNameInput = document.getElementById('taskName');
-    const taskDescriptionInput = document.getElementById('taskDescription');
-    const taskStatusInput = document.getElementById('taskStatus');
-    const taskDeadlineInput = document.getElementById('taskDeadline');
-    const taskDurationInput = document.getElementById('taskDuration');
-    const taskDurationLabel = document.getElementById('durationContainer');
-    const taskDeadlineLabel = document.getElementById('taskDeadlineLabel');
-    const saveButton = saveTaskBtn;
+    
+    editButton.style.display = "block";   // Ẩn nút "Save Changes"
+    saveTaskBtn.style.display = "none";  // Hiện nút "Add Task"
   
+    // Cập nhật tiêu đề và nội dung của button
+    modalHeader.textContent = 'Edit Task';
+  }
+  function initModalValue(task) {
     // Điền các giá trị có sẵn vào các input
     taskNameInput.value = task.task_name;
     taskDescriptionInput.value = task.description;
     
-    if (dragSrcEl.duration !== null) {
+    if (task.duration !== null ) {
       taskDurationInput.value = task.duration;
       taskStatusInput.value = 'Event';
       taskDurationLabel.style.display = "block";
@@ -251,35 +227,29 @@ document.addEventListener("DOMContentLoaded", async function () {
     taskDeadlineInput.value = new Date(deadlineDate.getTime() - deadlineDate.getTimezoneOffset() * 60000)
                             .toISOString()
                             .slice(0, 16);
-  
-    // Cập nhật tiêu đề và nội dung của button
-    const modalHeader = modal.querySelector('.modal-header h2');
-    modalHeader.textContent = 'Edit Task';
-    saveButton.textContent = 'Save Changes';
-  
-    // Cập nhật sự kiện của button
-    saveButton.onclick = async () => {
-      await updateTask(task);
-    };
-  
-    
+  }
+
+  function editTask(task) {
+    // Hiển thị modal và thay đổi tác label
+    openModalEditMode();
+    // Điền giá trị của task hiện tại vào modal
+    initModalValue(task);
   }
   
   
   async function updateTask(task) {
-    const taskName = document.getElementById('taskName').value;
-    const taskDescription = document.getElementById('taskDescription').value;
-    const taskDeadline = document.getElementById('taskDeadline').value;
-    const taskDuration = document.getElementById('taskDuration').value;
+    task.task_name = document.getElementById('taskName').value;
+    task.description = document.getElementById('taskDescription').value;
+    task.deadline = document.getElementById('taskDeadline').value;
+    task.duration = document.getElementById('taskDuration').value;
   
     // Cập nhật task trong Supabase
     const { data, error } = await supabase.from('Task')
       .update({
-        status: task.status,
-        task_name: taskName,
-        description: taskDescription,
-        deadline: taskDeadline,
-        duration: taskDuration || null, // Chỉ cập nhật duration nếu có
+        task_name: task.task_name,
+        description: task.description,
+        deadline: task.deadline,
+        duration: task.duration || null, // Chỉ cập nhật duration nếu có
       })
       .eq('created_at', task.created_at);
   
@@ -288,7 +258,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     } else {
       console.log("Task updated successfully:", data);
       console.log('New task:', task);
-      // renderTasks();
 
       // B1: Tìm task hiện tại và xóa khỏi task-list cũ
       const taskElement = document.querySelector(`[data-task-id='${task.created_at}']`);
@@ -300,7 +269,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       // B2: Cập nhật lại trạng thái dựa trên deadline
       const deadlineDate = new Date(taskDeadline);
       const timeDiff = deadlineDate - new Date(); // Tính khoảng cách thời gian (ms)
-      task.deadline = taskDeadline; // Cập nhật deadline mới
       updateTaskStatusBasedOnDeadline(task); // Cập nhật lại status
 
       // B3: Render lại HTML task mới
@@ -321,37 +289,28 @@ document.addEventListener("DOMContentLoaded", async function () {
   function updateTaskStatusBasedOnDeadline(task) {
     const now = new Date();
     const deadlineDate = new Date(task.deadline);
+    const deadlineOnlyDate = new Date(deadlineDate.getFullYear(), deadlineDate.getMonth(), deadlineDate.getDate());
+
     const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());  // Lấy ngày hiện tại không có giờ
     const timeDiff = deadlineDate - now;
 
-    // Kiểm tra nếu deadline là hôm nay, cập nhật status thành "Today task"
-    if (deadlineDate.getTime() === nowDate.getTime()) {
-      task.status = "Today task";
-      updateTaskStatus(task.created_at, "Today task");
-      return taskStatus(task, timeDiff);;
-    }
-
-    if (task.duration !== null) {
-      const durationMs = task.duration * 60 * 1000; // Chuyển duration từ phút sang ms
-      console.log('Durationsms', durationMs)
-      if (timeDiff <= 0 && Math.abs(timeDiff) < durationMs) {
-        task.status = "Today task";
-        updateTaskStatus(task.created_at, "Today task");
-        return taskStatus(task, timeDiff);; // Nếu đã bắt đầu nhưng chưa hết thời gian
-      }
-    }
-
-    if (timeDiff > 0) {
-      if (task.duration !== null) {
-        task.status = "Event";
-        updateTaskStatus(task.created_at, "Event");
+    const durationMs = (task.duration !== null && task.duration !== "") ? task.duration * 60 * 1000 : 0; // Chuyển duration từ phút sang ms
+    
+    
+    if (timeDiff <= 0 && Math.abs(timeDiff) <= durationMs) {
+      // Kiểm tra đang trong thời gian event hoạt động
+      updateTaskStatus(task, "Today task");
+    } else if (deadlineOnlyDate.getTime() === nowDate.getTime() && timeDiff + durationMs >= 0) {
+      // Kiểm tra nếu deadline (bắt đầu hoặc kết thúc) là hôm nay, cập nhật status thành "Today task"
+      updateTaskStatus(task, "Today task");
+    } else if (timeDiff > 0) {
+      if (task.duration !== null && task.duration !== "") {
+        updateTaskStatus(task, "Event");
       } else {
-        task.status = "To do";
-        updateTaskStatus(task.created_at, "To do");
+        updateTaskStatus(task, "To do");
       }
     } else {
-      task.status = "Expired";
-      updateTaskStatus(task.created_at, "Expired");
+      updateTaskStatus(task, "Expired");
     }
     return taskStatus(task, timeDiff);
   }
@@ -406,18 +365,20 @@ document.addEventListener("DOMContentLoaded", async function () {
       taskList.appendChild(dragSrcEl); // Thêm task vào cột
       const status = this.getAttribute("data-status");
       // Cập nhật trạng thái của task trong cơ sở dữ liệu (Supabase)
-      updateTaskStatus(dragSrcEl.dataset.taskId, status);
+      // updateTaskStatus(dragSrcEl.dataset.taskId, status);
     }
 
     return false;
   }
 
   // Hàm cập nhật trạng thái task trong Supabase
-  async function updateTaskStatus(taskId, status) {
+  async function updateTaskStatus(task, status) {
+    if (task.status === status) return;
+    task.status = status;
     const { error } = await supabase
       .from('Task')
       .update({ status: status })
-      .eq('created_at', taskId);
+      .eq('created_at', task.created_at);
     if (error) {
       console.error("Error updating task status:", error);
     }
@@ -454,7 +415,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   // Gọi hàm renderTasks khi trang được tải xong
-  renderTasks();
+  await renderTasks();
   let projectColumns = document.querySelectorAll('.project-column');
 
   const background = document.getElementById('overlay');
@@ -462,11 +423,24 @@ document.addEventListener("DOMContentLoaded", async function () {
   const openModalBtn = document.getElementById("openTaskModal");
   const closeModal = document.getElementById("closeTaskModal");
 
-  // Hiển thị modal khi nhấn vào button
+  const modalHeader = modal.querySelector('.modal-header h2');
+
+  const editButton = document.getElementById("editTask");
+  const saveButton = document.getElementById("saveTask");
+
+  // Cập nhật sự kiện của button
+  editButton.onclick = async () => {
+    updateTask(dragSrcEl);
+    modal.style.display = "none";
+    background.style.display = "none";
+  };
+
+  // Hiển thị modal khi nhấn vào button "+ Add Task"
   openModalBtn.addEventListener("click", function () {
-    saveTaskBtn.textContent = "Add Task";
     modal.style.display = "block";
     background.style.display = "block";
+
+    restartModalValue();
   });
 
   // Ẩn modal khi nhấn vào nút đóng hoặc ngoài modal
@@ -482,8 +456,98 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
+
+  async function createTask() {
+    // Lấy giá trị từ các trường nhập liệu
+    let task = {
+      created_at: new Date().toISOString().slice(0, 19),
+      task_name: document.getElementById("taskName").value,
+      description: document.getElementById("taskDescription").value,
+      status: document.getElementById("taskStatus").value,
+      deadline: document.getElementById("taskDeadline").value, // Thay thế start_at bằng deadline
+      duration: null
+    };
+
+    // Nếu là Event hoặc Interview, lấy giá trị Duration
+    if (task.status === "Event") {
+        task.duration = document.getElementById("taskDuration").value;
+    }
+
+    // Kiểm tra xem các trường nhập liệu có hợp lệ không
+    if (!task.task_name || !task.description || !task.deadline || (task.duration !== null && !task.duration)) {
+        alert("All fields are required!"); // Nếu có trường rỗng, hiển thị cảnh báo
+        return false;
+    }
+
+    // Thêm task vào Supabase
+    const { error } = await supabase.from('Task').insert([{
+        created_at: task.created_at,
+        task_name: task.task_name,
+        description: task.description,
+        deadline: task.deadline, // Đổi tên cho phù hợp với logic ban đầu
+        duration: task.duration, // Chỉ thêm nếu là Event hoặc Interview
+        done: false
+    }]);
+
+    let remainingTime = updateTaskStatusBasedOnDeadline(task); // Cập nhật trạng thái dựa trên deadline
+
+    // Xử lý lỗi nếu có
+    if (error) {
+      console.error("Error adding task:", error);
+      return false;
+    } else {
+      // Render task HTML
+      const newTaskElement = taskHTML(task, remainingTime);
+
+      // Tìm cột có status tương ứng
+      const newColumn = document.querySelector(`.project-column[data-status="${task.status}"]`);
+      let newTaskList = newColumn.querySelector(".task-list");
+
+      // Thêm task vào cột
+      newTaskList.appendChild(newTaskElement);
+      return true;
+    }
+  }
+
   saveTaskBtn.addEventListener("click", function () {
+    let flag = false;
+    do {
+      flag = createTask();
+    } while (flag === false);
+
     modal.style.display = "none";
     background.style.display = "none";
   });
+
+  //Modal element
+  const taskNameInput = document.getElementById('taskName');
+  const taskDescriptionInput = document.getElementById('taskDescription');
+  const taskStatusInput = document.getElementById('taskStatus');
+  const taskDeadlineInput = document.getElementById('taskDeadline');
+  const taskDurationInput = document.getElementById('taskDuration');
+  const taskDurationLabel = document.getElementById('durationContainer');
+  const taskDeadlineLabel = document.getElementById('taskDeadlineLabel');
+
+  function restartModalValue() {
+    // Xóa nội dung của các input
+    taskNameInput.value = null;
+    taskDescriptionInput.value = null;
+    taskDurationInput.value = null;
+    taskDeadlineInput.value = null;
+  
+    // Đặt trạng thái về "To do"
+    taskStatusInput.value = "To do";
+  
+    // Ẩn trường Duration vì "To do" không cần
+    taskDurationLabel.style.display = "none";
+  
+    // Đặt lại nhãn deadline
+    taskDeadlineLabel.textContent = "Deadline:";
+
+    modalHeader.textContent = 'Add Task';
+
+    editButton.style.display = "none";   // Ẩn nút "Save Changes"
+    saveButton.style.display = "block";  // Hiện nút "Add Task"
+  }
+
 });

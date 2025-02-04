@@ -3,7 +3,8 @@
   --bg:#ebf0f7;
   --header:#fbf4f6;
   --text:#2e2e2f;
-  --white:#ffffff;
+  --white:#fff;
+  --color-1:#f6f8ed;
   --light-grey:#c4cad3;
   --tag-1:#ceecfd;
   --tag-1-text:#2e87ba;
@@ -71,7 +72,7 @@ h1 {
 .project-info .add-task-btn {
   padding: 12px 15px;
   background-color: #3f7dae;
-  color: white;
+  color: var(--white);
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -89,7 +90,6 @@ h1 {
   grid-column-gap: 1.5rem;
 }
 .project-column {
-  background: linear-gradient(180deg, rgba(144, 188, 213, 0.2196078431), rgba(170, 224, 255, 0.3019607843));
   border-radius: 13px;
   padding: 10px;
   padding-top: 15px;
@@ -97,7 +97,7 @@ h1 {
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   height: 78vh;
   position: relative;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
   border: 2px solid #ebf0f7;
 }
 .project-column-heading {
@@ -136,7 +136,7 @@ h1 {
 
 .task {
   cursor: move;
-  background-color: var(--white);
+  background-color: #ecf6ee;
   padding: 0.6rem 1rem 0.6rem 1rem;
   border-radius: 8px;
   width: 100%;
@@ -154,7 +154,7 @@ h1 {
   /* Khi dropdown mở */
 }
 .task.task-done {
-  background-color: rgba(98, 153, 192, 0.774); /* Xanh nhạt */
+  background-color: rgb(98, 153, 192); /* Xanh nhạt */
   opacity: 0.8;
 }
 .task.task-done:hover {
@@ -227,7 +227,7 @@ h1 {
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
+  background: var(--white);
   border-radius: 8px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   list-style: none;
@@ -267,6 +267,62 @@ h1 {
   padding: 3rem 2rem;
 }
 
+.sidebar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 15%;
+  height: 100vh;
+  background-color: #216298;
+  color: var(--white);
+  border-right: 2px solid #2c60a3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+}
+.sidebar h3 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+.sidebar ul {
+  width: 100%;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 15vh;
+}
+.sidebar-btn {
+  background-color: #ecf6ee;
+  color: #3f7dae;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.sidebar-btn:hover {
+  background-color: rgba(121, 189, 237, 0.881);
+  color: var(--color-1);
+}
+
+/* View Content */
+.view {
+  display: none;
+  padding: 20px;
+}
+
+.hidden {
+  display: none;
+}
+
 .tag-progress {
   margin: 1.5rem 0;
 }
@@ -296,7 +352,7 @@ h1 {
   align-items: center;
   padding: 8px 12px;
   margin-bottom: 6px;
-  background: #fff;
+  background: var(--white);
   border-radius: 6px;
   border-left: 4px solid #007bff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -384,7 +440,7 @@ h1 {
 }
 .modal .modal-content {
   position: relative;
-  background-color: white;
+  background-color: var(--white);
   padding: 20px;
   width: 30vw;
   border-radius: 5px;
@@ -405,7 +461,7 @@ h1 {
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  background-color: white;
+  background-color: var(--white);
   appearance: none; /* Loại bỏ kiểu mặc định của trình duyệt */
   box-sizing: border-box; /* Đảm bảo padding không làm thay đổi kích thước tổng thể */
 }
@@ -426,16 +482,16 @@ h1 {
   background-size: 16px;
   padding-right: 30px;
 }
-.modal .modal-content #saveTask {
+.modal .modal-content #saveTask, .modal .modal-content #editTask {
   font-weight: bold;
   padding: 10px 15px;
   background-color: #3f7dae;
-  color: white;
+  color: var(--white);
   border: none;
   border-radius: 10px;
   cursor: pointer;
 }
-.modal .modal-content #saveTask:hover {
+.modal .modal-content #saveTask:hover, .modal .modal-content #editTask:hover {
   background-color: #114a7f;
 }
 .modal .modal-content .modal-header {
@@ -457,7 +513,7 @@ h1 {
   .project {
     max-width: 100%;
   }
-  .task-details {
+  .sidebar {
     width: 100%;
     display: flex;
   }
@@ -486,7 +542,7 @@ h1 {
   .project-tasks {
     grid-template-columns: 1fr;
   }
-  .task-details {
+  .sidebar {
     flex-wrap: wrap;
     padding: 3rem 1rem;
   }
