@@ -1,5 +1,17 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
+// for local
+// const isLocal = import.meta.env.MODE === "development"; // Kiểm tra môi trường
+
+// const supabaseUrl = isLocal
+//   ? import.meta.env.VITE_SUPABASE_URL // Dùng `.env` khi chạy local
+//   : process.env.VITE_SUPABASE_URL; // Dùng secrets khi chạy trên GitHub
+
+// const supabaseKey = isLocal
+//   ? import.meta.env.VITE_SUPABASE_KEY
+//   : process.env.VITE_SUPABASE_KEY;
+
+
 const supabaseUrl=import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey=import.meta.env.VITE_SUPABASE_KEY;
 
