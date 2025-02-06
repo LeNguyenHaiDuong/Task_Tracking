@@ -49,3 +49,9 @@ vercel --prod
 ```
 
 ---
+## 7. Hoàn tất triển khai  
+Vercel sẽ cung cấp cho bạn một đường link đến trang web sau khi deploy thành công.  
+Bạn sẽ có một trang web tương tự như thế này:  
+
+![Trang web đã triển khai](/background/image.png)
+---
