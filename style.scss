@@ -49,6 +49,14 @@
     height: 100vh;
     display: inline-block;
   
+
+    &-tasks {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      width:100%;
+      grid-column-gap:1.5rem;
+    }
+    
     &-info {
       text-align: center;
       padding: 1.5rem 1rem 1.5rem 0;
@@ -94,12 +102,7 @@
   
   
     
-    &-tasks {
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      width:100%;
-      grid-column-gap:1.5rem;
-    }
+    
     &-column {
       border-radius: 13px; // Bo góc mềm mại
       padding: 10px; // Khoảng cách bên trong
@@ -231,7 +234,7 @@
     }
 
 
-    .task__tags {
+    &__tags {
       display: flex;
       align-items: center; // Căn giữa theo chiều dọc
       justify-content: space-between;
@@ -255,42 +258,39 @@
       &-btn:hover {
         color: #114a7f;
       }
+
+      /* Ẩn menu mặc định */
+      &-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        list-style: none;
+        padding: 5px 0;
+        min-width: 100px;
+        display: none;
+        z-index: 10;
+
+        .dropdown-item {
+          padding: 8px 15px;
+          cursor: pointer;
+          font-size: 14px;
+          text-align: left;
+          transition: background 0.2s;
+
+          &:hover {
+            background: #f1f1f1;
+          }
+        }
+      }
+
+      &.open .dropdown-menu {
+        display: block;
+      }
     }
 
-    
-
-
-    /* Ẩn menu mặc định */
-    .dropdown-menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background: var(--white);
-      border-radius: 8px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      list-style: none;
-      padding: 5px 0;
-      min-width: 100px;
-      display: none;
-      z-index: 10;
-    }
-
-    .dropdown-menu .dropdown-item {
-      padding: 8px 15px;
-      cursor: pointer;
-      font-size: 14px;
-      text-align: left;
-      transition: background 0.2s;
-    }
-
-    .dropdown-menu .dropdown-item:hover {
-      background: #f1f1f1;
-    }
-
-    /* Khi dropdown mở */
-    .dropdown.open .dropdown-menu {
-      display: block;
-    }
 
     .remaining-time {
       text-align: right;

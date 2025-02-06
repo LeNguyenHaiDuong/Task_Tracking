@@ -45,6 +45,12 @@ h1 {
   height: 100vh;
   display: inline-block;
 }
+.project-tasks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+  grid-column-gap: 1.5rem;
+}
 .project-info {
   text-align: center;
   padding: 1.5rem 1rem 1.5rem 0;
@@ -82,12 +88,6 @@ h1 {
 }
 .project-info .add-task-btn:hover {
   background-color: #114a7f;
-}
-.project-tasks {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  width: 100%;
-  grid-column-gap: 1.5rem;
 }
 .project-column {
   border-radius: 13px;
@@ -150,8 +150,6 @@ h1 {
   flex-direction: column;
   justify-content: space-between;
   /* Kiểu dropdown */
-  /* Ẩn menu mặc định */
-  /* Khi dropdown mở */
 }
 .task.task-done {
   background-color: rgb(98, 153, 192); /* Xanh nhạt */
@@ -202,7 +200,7 @@ h1 {
   color: var(--light-grey);
   font-size: 17px;
 }
-.task .task__tags {
+.task__tags {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -211,6 +209,7 @@ h1 {
 .task .dropdown {
   position: relative;
   display: inline-block;
+  /* Ẩn menu mặc định */
 }
 .task .dropdown-btn {
   background: transparent;
