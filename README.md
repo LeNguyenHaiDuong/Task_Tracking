@@ -29,16 +29,20 @@ git clone <repository-url> .
 
 ---
 
-## 4. Thêm Biến Môi Trường (`.env`)  
-Tạo file `.env` trong thư mục project và thêm thông tin kết nối cơ sở dữ liệu (ví dụ: **Supabase**):  
-```
-VITE_SUPABASE_URL=https://your-supabase-url
-VITE_SUPABASE_KEY=your-supabase-key
+## 4. Cấu hình Database  
+Tạo file `.env` và thêm thông tin kết nối đến Supabase (hoặc cơ sở dữ liệu khác).  
+Cấu trúc của database sẽ tương tự như hình dưới đây:  
+
+![Cấu trúc Database](/background/database.png)  
+
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_KEY=your_supabase_key
 ```
 
 ---
 
-## 6. Deploy lên Vercel  
+## 5. Deploy lên Vercel  
 - **Deploy lần đầu** *(sẽ có hướng dẫn để nhập config nếu cần)*  
 ```sh
 vercel
@@ -49,7 +53,7 @@ vercel --prod
 ```
 
 ---
-## 7. Hoàn tất triển khai  
+## 6. Hoàn tất triển khai  
 Vercel sẽ cung cấp cho bạn một đường link đến trang web sau khi deploy thành công.  
 Bạn sẽ có một trang web tương tự như thế này:  
 
